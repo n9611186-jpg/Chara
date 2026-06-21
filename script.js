@@ -58,21 +58,8 @@ function advanceDialog() {
 
 function showChoices() {
     isChoicePhase = true;
-    
-    // ПРОВЕРКА РАСШИРЕНИЙ: Пытаемся загрузить Choice.jpg
-    charaImg.src = "Choice.jpg";
-    
-    // Если файл не найден (ошибка загрузки), скрипт по очереди проверяет другие регистры букв
-    charaImg.onerror = function() {
-        if (charaImg.src.endsWith("Choice.jpg")) {
-            charaImg.src = "Choice.JPG";
-        } else if (charaImg.src.endsWith("Choice.JPG")) {
-            charaImg.src = "Choice.jpeg";
-        } else if (charaImg.src.endsWith("Choice.jpeg")) {
-            charaImg.src = "Choice.JPEG";
-        }
-    };
-
+    // НАСТРОЕНО ПОД ТВOЙ НОВЫЙ ФАЙЛ: Смена эмоции на Choice.png перед выбором
+    charaImg.src = "Choice.png"; 
     choicesBox.style.display = "flex";
 }
 
