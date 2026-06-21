@@ -1,10 +1,5 @@
-const screamSound = new Audio("scream.mp3");
-screamSound.preload = "auto";
-// Замедляем трек, чтобы он тянулся дольше, стал басовее и не давал провалов
-screamSound.playbackRate = 0.72; 
-
 const phrases = ["* Приветствую.", "* Я Чара.", "* Спасибо тебе.", "* Твоя сила пробудила меня от смерти.", "* Давай сотрем этот бесполезный мир..."];
-let currentLine = 0, isTyping = false, typingTimeout, dialogStarted = false, isChoicePhase = false, finalBranch = "", finalStep = 0;
+let currentLine = 0, isTyping = false, typingTimeout, dialogStarted = false, isChoicePhase = false, finalBranch = "", finalStep = 0, soundInterval;
 const dialogBox = document.getElementById('dialogBox'), dialogText = document.getElementById('dialogText'), choicesBox = document.getElementById('choicesBox'), charaImg = document.getElementById('charaImg');
 
 function typeText(t, i = 0, c = null) {
@@ -25,7 +20,7 @@ function advanceDialog() {
 function showChoices() { isChoicePhase = true; choicesBox.style.display = "flex"; }
 function makeChoice(a) {
     choicesBox.style.display = "none"; dialogText.textContent = ""; finalBranch = a; finalStep = 1;
-    screamSound.volume = 0; screamSound.play().then(() => { screamSound.pause(); screamSound.currentTime = 0; }).catch(e => console.log(e));
+    const t = new Audio("scream.mp3"); t.volume = 0; t.play().then(() => t.pause()).catch(e => console.log(e));
     if (a === 'erase') { typeText("* Именно. Ты отличный партнер."); } else { typeText("* Нет?..."); }
 }
 function handleDialogClick() {
@@ -44,28 +39,26 @@ function handleDialogClick() {
     }
 }
 function triggerChaos() {
-    screamSound.volume = 1; 
-    screamSound.play().catch(err => console.log(err));
+    dialogBox.style.display = "none"; choicesBox.style.display = "none"; charaImg.src = "Scary.webp";
     
-    dialogBox.style.display = "none"; 
-    choicesBox.style.display = "none"; 
-    charaImg.src = "Scary.webp";
+    // ЭФФЕКТ ХОРРОР-ЭХА: запускаем новые копии звука каждые 600 мс для сплошного гула
+    const playScream = () => { const s = new Audio("scream.mp3"); s.volume = 1; s.play().catch(e => console.log(e)); };
+    playScream();
+    soundInterval = setInterval(playScream, 600);
     
-    let scale = 1.0; 
-    const maxScale = 3.5, step = 0.03;
+    let scale = 1.0; const maxScale = 3.5, step = 0.03;
     const zoomInterval = setInterval(() => { if (scale < maxScale) { scale += step; charaImg.style.transform = `scale(${scale})`; } else { clearInterval(zoomInterval); } }, 50);
     
     setTimeout(() => { document.body.classList.add("flash-red", "shake-screen"); }, 250);
     
     setTimeout(() => { 
         clearInterval(zoomInterval); 
-        screamSound.pause(); 
-        screamSound.currentTime = 0; 
+        clearInterval(soundInterval); // Полностью выключаем бесконечный хоррор-гул
         document.body.classList.remove("flash-red", "shake-screen"); 
         charaImg.style.transform = "scale(1)"; 
         charaImg.src = "Chara.png"; 
         document.body.style.backgroundColor = "black"; 
         resetGame(); 
-    }, 4000); // 4 секунды тотального хоррора
+    }, 4000);
 }
 function resetGame() { currentLine = 0; isTyping = false; dialogStarted = false; isChoicePhase = false; finalBranch = ""; finalStep = 0; dialogBox.style.display = "none"; choicesBox.style.display = "none"; }
