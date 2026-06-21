@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chara Dialog</title>
+    <style>
+        /* Подключаем оригинальный пиксельный шрифт Undertale */
+        @import url('https://cdnfonts.com');
+
+        body {
+            margin: 0;
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Determination Mono', monospace;
+            user-select: none;
+        }
+
+        /* Контейнер для Чары */
+        .character-container {
+            cursor: pointer;
+            margin-bottom: 40px;
+            transition: transform 0.1s;
+        }
+        .character-container:active {
+            transform: scale(0.95); /* Эффект нажатия */
+        }
+
+        img {
+            image-rendering: pixelated;
+            width: 100px;
+            height: auto;
+        }
+
+        /* Стили текстового окна Undertale */
+        .textbox {
+            width: 85%;
+            max-width: 500px;
+            height: 90px;
+            border: 4px solid white;
+            background-color: black;
+            padding: 15px;
+            box-sizing: border-box;
+            display: none; /* Изначально скрыто */
+            position: relative;
+        }
+
+        .text-content {
+            color: white;
+            font-size: 22px;
+            letter-spacing: 1px;
+            line-height: 1.4;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="character-container" id="charaBtn">
+        <img src="https://nocookie.net" alt="Chara">
+    </div>
+
+    <div class="textbox" id="dialogBox">
+        <p class="text-content" id="dialogText"></p>
+    </div>
+
+    <script>
+        // Массив с репликами диалога. Можете вписать сюда любые фразы!
+        const phrases = [
+            "* Приветствую.",
+            "* Я Чара.",
+            "* Спасибо тебе.",
+            "* Твоя сила пробудила меня от смерти.",
+            "* Давай сотрем этот бесполезный мир..."
+        ];
+
+        let currentLine = 0;
+        let isTyping = false;
+        let typingTimeout;
+
+        const charaBtn = document.getElementById('charaBtn');
+        const dialogBox = document.getElementById('dialogBox');
+        const dialogText = document.getElementById('dialogText');
+
+        // Функция эффекта печатной машинки
+        function typeText(text, index = 0) {
+            if (index < text.length) {
+                isTyping = true;
+                dialogText.textContent += text[index];
+                typingTimeout = setTimeout(() => typeText(text, index + 1), 50); // Скорость печати (50мс)
+            } else {
+                isTyping = false;
+            }
+        }
+
+        function advanceDialog() {
+            // Если текст еще печатается, мгновенно отображаем его полностью
+            if (isTyping) {
+                clearTimeout(typingTimeout);
+                dialogText.textContent = phrases[currentLine];
+                isTyping = false;
+                return;
+            }
+
+            // Переходим к следующей строке
+            currentLine++;
+
+            if (currentLine < phrases.length) {
+                dialogText.textContent = "";
+                typeText(phrases[currentLine]);
+            } else {
+                // Когда диалог закончился — скрываем окно и сбрасываем счетчик
+                dialogBox.style.display = "none";
+                dialogText.textContent = "";
+                currentLine = 0;
+            }
+        }
+
+        // Клик по Чаре запускает или продвигает диалог
+        charaBtn.addEventListener('click', () => {
+            if (dialogBox.style.display === "none") {
+                dialogBox.style.display = "block";
+                dialogText.textContent = "";
+                typeText(phrases[0]);
+            } else {
+                advanceDialog();
+            }
+        });
+
+        // Клик по самому текстовому окну тоже продвигает диалог
+        dialogBox.addEventListener('click', advanceDialog);
+    </script>
+</body>
+</html>
