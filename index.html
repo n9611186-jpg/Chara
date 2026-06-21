@@ -27,12 +27,12 @@
         }
 
         @keyframes shake {
-            0% { transform: translate(4px, 2px) rotate(0deg); }
-            20% { transform: translate(-3px, -2px) rotate(-1deg); }
-            40% { transform: translate(-5px, 0px) rotate(1deg); }
-            60% { transform: translate(0px, 4px) rotate(0deg); }
-            80% { transform: translate(3px, -2px) rotate(1deg); }
-            100% { transform: translate(-2px, 3px) rotate(-1deg); }
+            0% { transform: translate(5px, 3px) rotate(0deg); }
+            20% { transform: translate(-4px, -3px) rotate(-1deg); }
+            40% { transform: translate(-6px, 0px) rotate(1deg); }
+            60% { transform: translate(0px, 5px) rotate(0deg); }
+            80% { transform: translate(4px, -3px) rotate(1deg); }
+            100% { transform: translate(-3px, 4px) rotate(-1deg); }
         }
 
         @keyframes flash {
@@ -47,7 +47,6 @@
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
             z-index: 10;
-            /* ИСПРАВЛЕНО: Создаем жесткие границы контейнера, чтобы картинки не сжимались */
             width: 140px;
             height: 230px;
             display: flex;
@@ -57,7 +56,6 @@
 
         img {
             image-rendering: pixelated;
-            /* ИСПРАВЛЕНО: Фиксируем высоту под рост Чары, чтобы Scary.webp не уменьшала саму себя */
             height: 230px;
             width: auto;
             display: block;
@@ -132,6 +130,7 @@
     <script>
         const screamSound = new Audio("scream.mp3");
         screamSound.preload = "auto";
+        screamSound.loop = true; // НОВОЕ: звук будет зациклен, чтобы не прерываться раньше времени
 
         const phrases = [
             "* Приветствую.",
@@ -267,8 +266,8 @@
             charaImg.src = "Scary.webp";
             
             let currentScale = 1.0;
-            const maxScale = 2.6; 
-            const step = 0.04;    
+            const maxScale = 4.5; // НАСТРОЕНО: вырастает крупно в 4.5 раза
+            const step = 0.045;   // Плавный шаг на 4 секунды
             
             const zoomInterval = setInterval(() => {
                 if (currentScale < maxScale) {
@@ -284,15 +283,18 @@
                 document.body.classList.add("shake-screen");
             }, 250);
 
+            // НАСТРОЕНО НА 4 СЕКУНДЫ (4000 мс) тотального хаоса
             setTimeout(() => {
                 clearInterval(zoomInterval);
+                screamSound.pause(); // Выключаем музыку в конце
+                screamSound.currentTime = 0;
                 document.body.classList.remove("flash-red");
                 document.body.classList.remove("shake-screen");
                 charaImg.style.transform = "scale(1)";
                 charaImg.src = "Chara.png"; 
                 document.body.style.backgroundColor = "black";
                 resetGame();
-            }, 2000); 
+            }, 4000); 
         }
 
         function resetGame() {
@@ -306,5 +308,3 @@
             choicesBox.style.display = "none";
         }
     </script>
-</body>
-</html>
