@@ -20,11 +20,11 @@
     </style>
 </head>
 <body>
-    <div class="character-container" onclick="handleCharaClick()"><img src="Chara.png" id="charaImg" alt="Chara"></div>
-    <div class="textbox" id="dialogBox" onclick="handleDialogClick()"><p class="text-content" id="dialogText"></p></div>
-    <div class="choices-container" id="choicesBox"><button class="choice-btn" onclick="makeChoice('erase')">[ СТЕРЕТЬ ]</button><button class="choice-btn" onclick="makeChoice('do_not')">[ НЕ СТЕРЕТЬ ]</button></div>
+    <!-- ИСПРАВЛЕНО: убрали onclick, теперь код не дублирует нажатия -->
+    <div class="character-container" id="charaBtn"><img src="Chara.png" id="charaImg" alt="Chara"></div>
+    <div class="textbox" id="dialogBox"><p class="text-content" id="dialogText"></p></div>
+    <div class="choices-container" id="choicesBox"><button class="choice-btn" id="eraseBtn">[ СТЕРЕТЬ ]</button><button class="choice-btn" id="dontBtn">[ НЕ СТЕРЕТЬ ]</button></div>
     
-    <!-- Подключаем наш скрипт из отдельного файла -->
     <script src="script.js"></script>
 </body>
 </html>
