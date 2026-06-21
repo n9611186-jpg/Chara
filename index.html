@@ -47,12 +47,19 @@
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
             z-index: 10;
+            /* ИСПРАВЛЕНО: Создаем жесткие границы контейнера, чтобы картинки не сжимались */
+            width: 140px;
+            height: 230px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         img {
             image-rendering: pixelated;
-            width: 140px;
-            height: auto;
+            /* ИСПРАВЛЕНО: Фиксируем высоту под рост Чары, чтобы Scary.webp не уменьшала саму себя */
+            height: 230px;
+            width: auto;
             display: block;
             pointer-events: none;
             transition: transform 0.05s linear;
@@ -260,8 +267,8 @@
             charaImg.src = "Scary.webp";
             
             let currentScale = 1.0;
-            const maxScale = 2.6; // НАСТРОЕНО: максимальный увеличенный размер
-            const step = 0.04;    // НАСТРОЕНО: увеличенный шаг (1.02, 1.06, 1.10...)
+            const maxScale = 2.6; 
+            const step = 0.04;    
             
             const zoomInterval = setInterval(() => {
                 if (currentScale < maxScale) {
