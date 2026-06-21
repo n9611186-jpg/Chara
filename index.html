@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chara Choice</title>
+    <title>Chara Final Cutscene</title>
     <style>
         body {
             margin: 0;
@@ -18,34 +18,29 @@
             user-select: none;
         }
 
-        /* Эффект тряски экрана */
+        /* Сильная тряска экрана */
         .shake-screen {
-            animation: shake 0.1s infinite;
+            animation: shake 0.05s infinite !important;
         }
 
-        /* Эффект бешеного мигания */
+        /* Агрессивное моргание красно-черным */
         .flash-red {
-            animation: flash 0.15s infinite;
+            animation: flash 0.1s infinite !important;
         }
 
         @keyframes shake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% { transform: translate(4px, 2px) rotate(0deg); }
+            20% { transform: translate(-3px, -2px) rotate(-1deg); }
+            40% { transform: translate(-5px, 0px) rotate(1deg); }
+            60% { transform: translate(0px, 4px) rotate(0deg); }
+            80% { transform: translate(3px, -2px) rotate(1deg); }
+            100% { transform: translate(-2px, 3px) rotate(-1deg); }
         }
 
         @keyframes flash {
-            0% { background-color: red; }
-            50% { background-color: black; }
-            100% { background-color: darkred; }
+            0% { background-color: #ff0000; }
+            50% { background-color: #000000; }
+            100% { background-color: #550000; }
         }
 
         .character-container {
@@ -114,11 +109,11 @@
 </head>
 <body>
 
-    <div class="character-container" id="charaDiv" onclick="handleCharaClick()">
+    <div class="character-container" onclick="handleCharaClick()">
         <img src="Chara.png" alt="Chara">
     </div>
 
-    <div class="textbox" id="dialogBox" onclick="advanceDialog()">
+    <div class="textbox" id="dialogBox" onclick="handleDialogClick()">
         <p class="text-content" id="dialogText"></p>
     </div>
 
@@ -128,9 +123,9 @@
     </div>
 
     <script>
-        // Загружаем оригинальный жуткий гул Чары
-        const screamSound = new Audio("https://soundboard.com");
-        screamSound.preload = "auto"; // Заставляем телефон скачать звук заранее
+        // Гул/Хоррор эмбиент для скримера
+        const screamSound = new Audio("https://google.com");
+        screamSound.preload = "auto";
 
         const phrases = [
             "* Приветствую.",
@@ -145,11 +140,13 @@
         let typingTimeout;
         let dialogStarted = false;
         let isChoicePhase = false;
+        
+        let finalBranch = ""; 
+        let finalStep = 0;
 
         const dialogBox = document.getElementById('dialogBox');
         const dialogText = document.getElementById('dialogText');
         const choicesBox = document.getElementById('choicesBox');
-        const charaDiv = document.getElementById('charaDiv');
 
         function typeText(text, index = 0, callback = null) {
             if (index < text.length) {
@@ -164,7 +161,6 @@
 
         function handleCharaClick() {
             if (isChoicePhase) return;
-            
             if (!dialogStarted) {
                 dialogStarted = true;
                 dialogBox.style.display = "block";
@@ -203,19 +199,70 @@
             choicesBox.style.display = "flex";
         }
 
-        function triggerScreamer() {
-            // Включаем звук сразу от клика пользователя, чтобы обойти защиту телефона
-            screamSound.play().catch(e => console.log("Ошибка звука:", e));
+        function makeChoice(answer) {
+            choicesBox.style.display = "none";
+            dialogText.textContent = "";
+            finalBranch = answer;
+            finalStep = 1;
 
-            // Скрываем элементы интерфейса
+            // Обман системы: запускаем аудио без звука прямо от тапа по кнопке
+            screamSound.volume = 0;
+            screamSound.play().then(() => {
+                screamSound.pause();
+                screamSound.currentTime = 0;
+            }).catch(e => console.log(e));
+
+            if (answer === 'erase') {
+                typeText("* Именно. Ты отличный партнер.");
+            } else {
+                typeText("* Нет?...");
+            }
+        }
+
+        function handleDialogClick() {
+            if (!isChoicePhase) {
+                advanceDialog();
+                return;
+            }
+
+            if (isTyping) {
+                clearTimeout(typingTimeout);
+                if (finalBranch === 'erase') {
+                    dialogText.textContent = "* Именно. Ты отличный партнер.";
+                } else if (finalBranch === 'do_not' && finalStep === 1) {
+                    dialogText.textContent = "* Нет?...";
+                } else if (finalBranch === 'do_not' && finalStep === 2) {
+                    dialogText.textContent = "* С каких это пор ты здесь главный?";
+                }
+                isTyping = false;
+                return;
+            }
+
+            if (finalBranch === 'erase' && finalStep === 1) {
+                triggerChaos();
+            } else if (finalBranch === 'do_not') {
+                if (finalStep === 1) {
+                    finalStep = 2;
+                    dialogText.textContent = "";
+                    typeText("* С каких это пор ты здесь главный?");
+                } else if (finalStep === 2) {
+                    triggerChaos();
+                }
+            }
+        }
+
+        function triggerChaos() {
+            // Включаем громкость на максимум и запускаем звук
+            screamSound.volume = 1;
+            screamSound.play().catch(err => console.log(err));
+            
             dialogBox.style.display = "none";
             choicesBox.style.display = "none";
-
-            // Запускаем безумную тряску и мигание всего экрана
+            
+            // Врубаем тряску и флеш-анимацию
             document.body.classList.add("flash-red");
             document.body.classList.add("shake-screen");
 
-            // Ровно через 3 секунды кошмар прекращается и игра сбрасывается
             setTimeout(() => {
                 document.body.classList.remove("flash-red");
                 document.body.classList.remove("shake-screen");
@@ -224,31 +271,13 @@
             }, 3000);
         }
 
-        function makeChoice(answer) {
-            choicesBox.style.display = "none";
-            dialogText.textContent = "";
-
-            if (answer === 'erase') {
-                typeText("* Именно. Ты отличный партнер.", 0, () => {
-                    setTimeout(triggerScreamer, 1000);
-                });
-            } else {
-                typeText("* Нет?...", 0, () => {
-                    setTimeout(() => {
-                        dialogText.textContent = "";
-                        typeText("* С каких это пор ты здесь главный?", 0, () => {
-                            setTimeout(triggerScreamer, 800);
-                        });
-                    }, 1200);
-                });
-            }
-        }
-
         function resetGame() {
             currentLine = 0;
             isTyping = false;
             dialogStarted = false;
             isChoicePhase = false;
+            finalBranch = "";
+            finalStep = 0;
             dialogBox.style.display = "none";
             choicesBox.style.display = "none";
         }
