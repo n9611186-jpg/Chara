@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chara Final Cutscene</title>
+    <title>Chara Jumpscare Effect</title>
     <style>
         body {
             margin: 0;
@@ -18,12 +18,19 @@
             user-select: none;
         }
 
+        /* Бешеная тряска экрана */
         .shake-screen {
             animation: shake 0.05s infinite !important;
         }
 
+        /* Агрессивное моргание красно-черным */
         .flash-red {
             animation: flash 0.1s infinite !important;
+        }
+
+        /* Моделька Чары летит прямо в экран */
+        .zoom-chara {
+            animation: zoomForward 2s linear forwards !important;
         }
 
         @keyframes shake {
@@ -41,11 +48,18 @@
             100% { background-color: #550000; }
         }
 
+        /* Картинка плавно растет во весь экран */
+        @keyframes zoomForward {
+            0% { transform: scale(1); }
+            100% { transform: scale(12); }
+        }
+
         .character-container {
             cursor: pointer;
             margin-bottom: 30px;
             padding: 10px;
             -webkit-tap-highlight-color: transparent;
+            z-index: 10;
         }
 
         img {
@@ -108,7 +122,7 @@
 <body>
 
     <div class="character-container" onclick="handleCharaClick()">
-        <img src="Chara.png" alt="Chara">
+        <img src="Chara.png" id="charaImg" alt="Chara">
     </div>
 
     <div class="textbox" id="dialogBox" onclick="handleDialogClick()">
@@ -144,6 +158,7 @@
         const dialogBox = document.getElementById('dialogBox');
         const dialogText = document.getElementById('dialogText');
         const choicesBox = document.getElementById('choicesBox');
+        const charaImg = document.getElementById('charaImg');
 
         function typeText(text, index = 0, callback = null) {
             if (index < text.length) {
@@ -164,7 +179,7 @@
                 choicesBox.style.display = "none";
                 dialogText.textContent = "";
                 currentLine = 0;
-                typeText(phrases[0]); 
+                typeText(phrases); 
             } else {
                 advanceDialog();
             }
@@ -248,24 +263,26 @@
         }
 
         function triggerChaos() {
-            // 1. Мгновенно даем команду на старт звука
             screamSound.volume = 1;
             screamSound.play().catch(err => console.log(err));
             
-            // 2. Скрываем диалоги
             dialogBox.style.display = "none";
             choicesBox.style.display = "none";
             
-            // 3. Задерживаем вспышки на 250 мс, чтобы они совпали со звуком из динамика
+            // ИСПРАВЛЕНО: Теперь ищет файл Scary.webp в твоей папке
+            charaImg.src = "Scary.webp";
+            
             setTimeout(() => {
                 document.body.classList.add("flash-red");
                 document.body.classList.add("shake-screen");
+                charaImg.classList.add("zoom-chara");
             }, 250);
 
-            // 4. ТАЙМЕР НАСТРОЕН НА 2 СЕКУНДЫ (2000 мс) общего кошмара
             setTimeout(() => {
                 document.body.classList.remove("flash-red");
                 document.body.classList.remove("shake-screen");
+                charaImg.classList.remove("zoom-chara");
+                charaImg.src = "Chara.png"; 
                 document.body.style.backgroundColor = "black";
                 resetGame();
             }, 2000); 
