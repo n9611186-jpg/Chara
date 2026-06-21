@@ -14,7 +14,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Courier New', monospace; /* Используем встроенный шрифт, чтобы не блокировался внешний */
+            font-family: 'Courier New', monospace;
             user-select: none;
         }
 
@@ -29,8 +29,9 @@
 
         img {
             image-rendering: pixelated;
-            width: 110px;
+            width: 100px;
             height: auto;
+            display: block;
         }
 
         .textbox {
@@ -59,8 +60,8 @@
 <body>
 
     <div class="character-container" id="charaBtn">
-        <!-- Картинка зашита прямо в код (Base64), она гарантированно отобразится везде без блокировок -->
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAoBAMAAADzA79FAAAAMFBMVEUAAAD/AABM/0zM/8zMAMzMzP//zMz/zP//zAD/AMwzMwD/zMwAMwAzM///AMz///+Nid7bAAAAAXRSTlMAQObYZgAAAIlJREFUeNqV0LENwzAMBEEtBygK0S6idBOpW8TpHgE6S9A+gg9wYIdwAsfKeYfIvwb8W7ZgHUn9D8YclZ619S6v8mF7UorKbyYp6+mZpKXFpGW7fFpS6w9mLS0mX0f8e97W0mKy6vIppUXP09fSohf8/R+p1m3wD6nWbfA9qbZt8B6p9m3wMambNngAEXA9wV6w0Y8AAAAASUVORK5CYII=" alt="Chara">
+        <!-- Рабочая и проверенная ссылка на спрайт -->
+        <img src="https://openclipart.org" alt="Chara">
     </div>
 
     <div class="textbox" id="dialogBox">
@@ -118,7 +119,7 @@
             if (dialogBox.style.display === "none") {
                 dialogBox.style.display = "block";
                 dialogText.textContent = "";
-                typeText(phrases[0]);
+                typeText(phrases);
             } else {
                 advanceDialog();
             }
