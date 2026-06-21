@@ -18,12 +18,10 @@
             user-select: none;
         }
 
-        /* Сильная тряска экрана */
         .shake-screen {
             animation: shake 0.05s infinite !important;
         }
 
-        /* Агрессивное моргание красно-черным */
         .flash-red {
             animation: flash 0.1s infinite !important;
         }
@@ -123,8 +121,8 @@
     </div>
 
     <script>
-        // Гул/Хоррор эмбиент для скримера
-        const screamSound = new Audio("https://google.com");
+        // Теперь звук берется прямо из твоего репозитория, где лежит сайт
+        const screamSound = new Audio("scream.mp3");
         screamSound.preload = "auto";
 
         const phrases = [
@@ -167,7 +165,8 @@
                 choicesBox.style.display = "none";
                 dialogText.textContent = "";
                 currentLine = 0;
-                typeText(phrases);
+                // ИСПРАВЛЕНО: берем строго первую фразу из списка по индексу 0
+                typeText(phrases[0]);
             } else {
                 advanceDialog();
             }
@@ -205,7 +204,7 @@
             finalBranch = answer;
             finalStep = 1;
 
-            // Обман системы: запускаем аудио без звука прямо от тапа по кнопке
+            // Разблокируем аудио через клик по кнопке выбора
             screamSound.volume = 0;
             screamSound.play().then(() => {
                 screamSound.pause();
@@ -252,14 +251,12 @@
         }
 
         function triggerChaos() {
-            // Включаем громкость на максимум и запускаем звук
             screamSound.volume = 1;
             screamSound.play().catch(err => console.log(err));
             
             dialogBox.style.display = "none";
             choicesBox.style.display = "none";
             
-            // Врубаем тряску и флеш-анимацию
             document.body.classList.add("flash-red");
             document.body.classList.add("shake-screen");
 
