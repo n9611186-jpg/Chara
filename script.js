@@ -9,10 +9,21 @@ const phrases = [
     "* Давай сотрем этот бесполезный мир..."
 ];
 
-let currentLine = 0, isTyping = false, typingTimeout, dialogStarted = false, isChoicePhase = false, finalBranch = "", finalStep = 0;
-const dialogBox = document.getElementById('dialogBox'), dialogText = document.getElementById('dialogText'), choicesBox = document.getElementById('choicesBox'), charaImg = document.getElementById('charaImg');
+let currentLine = 0;
+let isTyping = false;
+let typingTimeout;
+let dialogStarted = false;
+let isChoicePhase = false;
+let finalBranch = ""; 
+let finalStep = 0;
 
-function typeText(text, index = 0, callback = null) {
+const dialogBox = document.getElementById('dialogBox');
+const dialogText = document.getElementById('dialogText');
+const choicesBox = document.getElementById('choicesBox');
+const charaImg = document.getElementById('charaImg');
+
+// Полностью исправленная функция печати букв
+function typeText(text, index, callback) {
     if (index < text.length) {
         isTyping = true;
         dialogText.textContent += text[index];
@@ -31,8 +42,7 @@ function handleCharaClick() {
         choicesBox.style.display = "none";
         dialogText.textContent = "";
         currentLine = 0;
-        // ИСПРАВЛЕНО: берем строго первую фразу по индексу currentLine (то есть 0)
-        typeText(phrases[currentLine]); 
+        typeText(phrases[currentLine], 0, null); 
     } else {
         advanceDialog();
     }
@@ -64,7 +74,8 @@ function showChoices() {
     choicesBox.style.display = "flex";
 }
 
-function makeChoice(answer) {
+// При выборе ответа обнуляем аудио для телефона
+制造 = function makeChoice(answer) {
     choicesBox.style.display = "none";
     dialogText.textContent = "";
     finalBranch = answer;
@@ -77,9 +88,9 @@ function makeChoice(answer) {
     }).catch(e => console.log(e));
 
     if (answer === 'erase') {
-        typeText("* Именно. Ты отличный партнер.");
+        typeText("* Именно. Ты отличный партнер.", 0, null);
     } else {
-        typeText("* Нет?...");
+        typeText("* Нет?...", 0, null);
     }
 }
 
@@ -108,7 +119,7 @@ function handleDialogClick() {
         if (finalStep === 1) {
             finalStep = 2;
             dialogText.textContent = "";
-            typeText("* С каких это пор ты здесь главный?");
+            typeText("* С каких это пор ты здесь главный?", 0, null);
         } else if (finalStep === 2) {
             triggerChaos();
         }
@@ -159,4 +170,5 @@ function resetGame() {
     finalStep = 0;
     dialogBox.style.display = "none";
     choicesBox.style.display = "none";
+    dialogText.textContent = "";
 }
