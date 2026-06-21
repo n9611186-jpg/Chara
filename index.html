@@ -16,7 +16,36 @@
             overflow: hidden;
             font-family: 'Courier New', monospace;
             user-select: none;
-            transition: background-color 0.1s;
+        }
+
+        /* Эффект тряски экрана */
+        .shake-screen {
+            animation: shake 0.1s infinite;
+        }
+
+        /* Эффект бешеного мигания */
+        .flash-red {
+            animation: flash 0.15s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes flash {
+            0% { background-color: red; }
+            50% { background-color: black; }
+            100% { background-color: darkred; }
         }
 
         .character-container {
@@ -57,9 +86,8 @@
             white-space: pre-wrap;
         }
 
-        /* Контейнер для кнопок выбора */
         .choices-container {
-            display: none; /* Изначально скрыт */
+            display: none;
             justify-content: space-around;
             width: 85%;
             max-width: 500px;
@@ -79,14 +107,14 @@
         }
 
         .choice-btn:hover, .choice-btn:active {
-            color: #ff9d00; /* Оранжевый цвет Undertale при наведении/нажатии */
+            color: #ff9d00;
             border-color: #ff9d00;
         }
     </style>
 </head>
 <body>
 
-    <div class="character-container" onclick="handleCharaClick()">
+    <div class="character-container" id="charaDiv" onclick="handleCharaClick()">
         <img src="Chara.png" alt="Chara">
     </div>
 
@@ -94,15 +122,15 @@
         <p class="text-content" id="dialogText"></p>
     </div>
 
-    <!-- Кнопки выбора -->
     <div class="choices-container" id="choicesBox">
         <button class="choice-btn" onclick="makeChoice('erase')">[ СТЕРЕТЬ ]</button>
         <button class="choice-btn" onclick="makeChoice('do_not')">[ НЕ СТЕРЕТЬ ]</button>
     </div>
 
     <script>
-        // Оригинальный звук скримера Чары
+        // Загружаем оригинальный жуткий гул Чары
         const screamSound = new Audio("https://soundboard.com");
+        screamSound.preload = "auto"; // Заставляем телефон скачать звук заранее
 
         const phrases = [
             "* Приветствую.",
@@ -121,6 +149,7 @@
         const dialogBox = document.getElementById('dialogBox');
         const dialogText = document.getElementById('dialogText');
         const choicesBox = document.getElementById('choicesBox');
+        const charaDiv = document.getElementById('charaDiv');
 
         function typeText(text, index = 0, callback = null) {
             if (index < text.length) {
@@ -134,7 +163,7 @@
         }
 
         function handleCharaClick() {
-            if (isChoicePhase) return; // Блокируем клики по Чаре во время выбора
+            if (isChoicePhase) return;
             
             if (!dialogStarted) {
                 dialogStarted = true;
@@ -142,7 +171,7 @@
                 choicesBox.style.display = "none";
                 dialogText.textContent = "";
                 currentLine = 0;
-                typeText(phrases[0]);
+                typeText(phrases);
             } else {
                 advanceDialog();
             }
@@ -155,11 +184,7 @@
                 clearTimeout(typingTimeout);
                 dialogText.textContent = phrases[currentLine];
                 isTyping = false;
-                
-                // Если это была последняя фраза, сразу показываем кнопки
-                if (currentLine === phrases.length - 1) {
-                    showChoices();
-                }
+                if (currentLine === phrases.length - 1) showChoices();
                 return;
             }
 
@@ -168,10 +193,7 @@
             if (currentLine < phrases.length) {
                 dialogText.textContent = "";
                 typeText(phrases[currentLine], 0, () => {
-                    // Если допечатали до последней фразы — выводим меню выбора
-                    if (currentLine === phrases.length - 1) {
-                        showChoices();
-                    }
+                    if (currentLine === phrases.length - 1) showChoices();
                 });
             }
         }
@@ -181,42 +203,43 @@
             choicesBox.style.display = "flex";
         }
 
+        function triggerScreamer() {
+            // Включаем звук сразу от клика пользователя, чтобы обойти защиту телефона
+            screamSound.play().catch(e => console.log("Ошибка звука:", e));
+
+            // Скрываем элементы интерфейса
+            dialogBox.style.display = "none";
+            choicesBox.style.display = "none";
+
+            // Запускаем безумную тряску и мигание всего экрана
+            document.body.classList.add("flash-red");
+            document.body.classList.add("shake-screen");
+
+            // Ровно через 3 секунды кошмар прекращается и игра сбрасывается
+            setTimeout(() => {
+                document.body.classList.remove("flash-red");
+                document.body.classList.remove("shake-screen");
+                document.body.style.backgroundColor = "black";
+                resetGame();
+            }, 3000);
+        }
+
         function makeChoice(answer) {
-            choicesBox.style.display = "none"; // Прячем кнопки обратно
+            choicesBox.style.display = "none";
             dialogText.textContent = "";
 
             if (answer === 'erase') {
-                // Ветка: СТЕРЕТЬ
                 typeText("* Именно. Ты отличный партнер.", 0, () => {
-                    setTimeout(() => {
-                        screamSound.play(); // Скример
-                        document.body.style.backgroundColor = "red"; // Красная вспышка
-                        dialogBox.style.display = "none";
-                        
-                        setTimeout(() => {
-                            document.body.style.backgroundColor = "black";
-                            resetGame();
-                        }, 2000);
-                    }, 1000);
+                    setTimeout(triggerScreamer, 1000);
                 });
             } else {
-                // Ветка: НЕ СТЕРЕТЬ
                 typeText("* Нет?...", 0, () => {
                     setTimeout(() => {
                         dialogText.textContent = "";
                         typeText("* С каких это пор ты здесь главный?", 0, () => {
-                            setTimeout(() => {
-                                screamSound.play(); // Скример все равно бьет
-                                document.body.style.backgroundColor = "darkred";
-                                dialogBox.style.display = "none";
-                                
-                                setTimeout(() => {
-                                    document.body.style.backgroundColor = "black";
-                                    resetGame();
-                                }, 2000);
-                            }, 1000);
+                            setTimeout(triggerScreamer, 800);
                         });
-                    }, 1500);
+                    }, 1200);
                 });
             }
         }
