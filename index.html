@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chara Dialog</title>
     <style>
-        /* Подключаем оригинальный пиксельный шрифт Undertale */
-        @import url('https://cdnfonts.com');
-
         body {
             margin: 0;
             background-color: black;
@@ -17,42 +14,41 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Determination Mono', monospace;
+            font-family: 'Courier New', monospace; /* Используем встроенный шрифт, чтобы не блокировался внешний */
             user-select: none;
         }
 
-        /* Контейнер для Чары */
         .character-container {
             cursor: pointer;
             margin-bottom: 40px;
             transition: transform 0.1s;
         }
         .character-container:active {
-            transform: scale(0.95); /* Эффект нажатия */
+            transform: scale(0.95);
         }
 
         img {
             image-rendering: pixelated;
-            width: 100px;
+            width: 110px;
             height: auto;
         }
 
-        /* Стили текстового окна Undertale */
         .textbox {
             width: 85%;
             max-width: 500px;
-            height: 90px;
+            height: 100px;
             border: 4px solid white;
             background-color: black;
             padding: 15px;
             box-sizing: border-box;
-            display: none; /* Изначально скрыто */
+            display: none;
             position: relative;
         }
 
         .text-content {
             color: white;
-            font-size: 22px;
+            font-size: 20px;
+            font-weight: bold;
             letter-spacing: 1px;
             line-height: 1.4;
             margin: 0;
@@ -63,8 +59,8 @@
 <body>
 
     <div class="character-container" id="charaBtn">
-        <!-- Рабочая ссылка на спрайт Чары, которая открывается везде -->
-        <img src="https://imagedelivery.net" alt="Chara">
+        <!-- Картинка зашита прямо в код (Base64), она гарантированно отобразится везде без блокировок -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAoBAMAAADzA79FAAAAMFBMVEUAAAD/AABM/0zM/8zMAMzMzP//zMz/zP//zAD/AMwzMwD/zMwAMwAzM///AMz///+Nid7bAAAAAXRSTlMAQObYZgAAAIlJREFUeNqV0LENwzAMBEEtBygK0S6idBOpW8TpHgE6S9A+gg9wYIdwAsfKeYfIvwb8W7ZgHUn9D8YclZ619S6v8mF7UorKbyYp6+mZpKXFpGW7fFpS6w9mLS0mX0f8e97W0mKy6vIppUXP09fSohf8/R+p1m3wD6nWbfA9qbZt8B6p9m3wMambNngAEXA9wV6w0Y8AAAAASUVORK5CYII=" alt="Chara">
     </div>
 
     <div class="textbox" id="dialogBox">
@@ -72,7 +68,6 @@
     </div>
 
     <script>
-        // Массив с репликами диалога. Можете вписать сюда любые фразы!
         const phrases = [
             "* Приветствую.",
             "* Я Чара.",
@@ -89,19 +84,17 @@
         const dialogBox = document.getElementById('dialogBox');
         const dialogText = document.getElementById('dialogText');
 
-        // Функция эффекта печатной машинки
         function typeText(text, index = 0) {
             if (index < text.length) {
                 isTyping = true;
                 dialogText.textContent += text[index];
-                typingTimeout = setTimeout(() => typeText(text, index + 1), 50); // Скорость печати (50мс)
+                typingTimeout = setTimeout(() => typeText(text, index + 1), 50);
             } else {
                 isTyping = false;
             }
         }
 
         function advanceDialog() {
-            // Если текст еще печатается, мгновенно отображаем его полностью
             if (isTyping) {
                 clearTimeout(typingTimeout);
                 dialogText.textContent = phrases[currentLine];
@@ -109,21 +102,18 @@
                 return;
             }
 
-            // Переходим к следующей строке
             currentLine++;
 
             if (currentLine < phrases.length) {
                 dialogText.textContent = "";
                 typeText(phrases[currentLine]);
             } else {
-                // Когда диалог закончился — скрываем окно и сбрасываем счетчик
                 dialogBox.style.display = "none";
                 dialogText.textContent = "";
                 currentLine = 0;
             }
         }
 
-        // Клик по Чаре запускает или продвигает диалог
         charaBtn.addEventListener('click', () => {
             if (dialogBox.style.display === "none") {
                 dialogBox.style.display = "block";
@@ -134,7 +124,6 @@
             }
         });
 
-        // Клик по самому текстовому окну тоже продвигает диалог
         dialogBox.addEventListener('click', advanceDialog);
     </script>
 </body>
